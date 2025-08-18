@@ -1,0 +1,57 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="cart-container">
+    <h2 class="cart-title">Shopping Cart</h2>
+    <hr>
+    
+    {% if cart_items %}
+        {% for item in cart_items %}
+        <div class="cart-item">
+            <div class="cart-item-image">
+                {% if item.product.image %}
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                {% else %}
+                    <img src="{% static 'images/default.png' %}" alt="No image available">
+                {% endif %}
+            </div>
+            
+            <div class="cart-item-info">
+                <h5>{{ item.product.name }}</h5>
+                <p class="stock">In stock</p>
+                <p class="shipping">Eligible for FREE Shipping</p>
+
+                <div class="quantity-form">
+                    <form method="post" action="{% url 'update_cart_quantity' item.id %}">
+                        {% csrf_token %}
+                        <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}" class="qty-btn" {% if item.quantity <= 1 %}disabled{% endif %}>−</button>
+                        <input type="number" value="{{ item.quantity }}" readonly class="qty-input">
+                        <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}" class="qty-btn">+</button>
+                    </form>
+                </div>
+                
+                <div class="actions">
+                    <a href="{% url 'remove_from_cart' item.id %}">Delete</a>
+                </div>
+            </div>
+
+            <div class="cart-item-price">
+                ₹{{ item.product.price }}
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="cart-subtotal">
+            <h5>Subtotal ({{ cart_items|length }} items): ₹{{ total_price }}</h5>
+            <a href="#" class="checkout-btn">Proceed to Checkout</a>
+        </div>
+    {% else %}
+        <div class="empty-cart">
+            Your cart is empty. <a href="{% url 'product_list' %}">Shop now</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+

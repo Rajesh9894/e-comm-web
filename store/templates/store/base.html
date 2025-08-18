@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MyStore{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="nav-brand">
+                    <a href="{% url 'home' %}" class="logo">
+                        <i class="fas fa-shopping-bag"></i> MyStore
+                    </a>
+                    <button class="mobile-menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                
+                <div class="nav-links-container">
+                    <ul class="nav-links">
+                        <li><a href="{% url 'product_list' %}">Products</a></li>
+                    </ul>
+                    
+                    <ul class="nav-actions">
+                        <li>
+                            <a href="{% url 'view_cart' %}" class="cart-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span id="cart-count" class="badge">{{ cart_count }}</span>
+                            </a>
+                        </li>
+                        {% if request.user.is_authenticated %}
+                            <li class="user-dropdown">
+                                <a href="#"><i class="fas fa-user-circle"></i> {{ request.user.username }}</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">My Account</a></li>
+                                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">Login</a></li>
+                            <li><a href="{% url 'register' %}" class="btn btn-outline">Register</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>MyStore</h3>
+                    <p>Your one-stop shop for quality products at affordable prices.</p>
+                </div>
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'product_list' %}">Products</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 MyStore. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+
