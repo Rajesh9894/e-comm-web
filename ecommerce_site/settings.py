@@ -1,6 +1,6 @@
 from pathlib import Path
 import os
-import dj_database_url # <--- new
+import dj_database_url  # <--- new
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -38,7 +38,7 @@ INSTALLED_APPS = [
 # ----------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # <--- add for static
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # <--- handles static files
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -55,7 +55,7 @@ ROOT_URLCONF = "ecommerce_site.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, "store/templates")],
+        "DIRS": [BASE_DIR / "store" / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -110,9 +110,8 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# WhiteNoise storage for versioned static files
-STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-STATICFILES_STORAGE = STORAGE
+# WhiteNoise storage (fix: use STATICFILES_STORAGE directly)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
@@ -122,4 +121,5 @@ MEDIA_ROOT = BASE_DIR / "media"
 # ----------------------------
 APPEND_SLASH = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 
