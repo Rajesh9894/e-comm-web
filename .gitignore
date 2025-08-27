@@ -1,20 +1,35 @@
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-
-# Django
-*.sqlite3
+# Django #
 *.log
 *.pot
 *.pyc
+__pycache__/
+db.sqlite3
+media/
 
-# VS Code
-.vscode/
+# If you have other SQLite files
+*.sqlite3
 
-# Environment
+# Django migrations (you may remove this if you want migrations in repo)
+*/migrations/__pycache__/
+*/migrations/*.pyc
+
+# Environment #
 venv/
 env/
+ENV/
+.venv/
+.env
+*.env
 
-# Media files
-/media/
+# VSCode #
+.vscode/
+
+# PyCharm #
+.idea/
+
+# OS generated files #
+.DS_Store
+Thumbs.db
+
+# Static files collected by collectstatic
+staticfiles/
