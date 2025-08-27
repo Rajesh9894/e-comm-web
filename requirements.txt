@@ -1,0 +1,5 @@
+Django>=5.2,<6
+whitenoise>=6.7
+dj-database-url>=2.2
+psycopg2-binary>=2.9   # for Postgres (Neon/Supabase). Remove if you’ll use MySQL.
+python-dotenv>=1.0     # optional, for local .env
