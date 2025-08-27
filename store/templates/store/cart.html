@@ -22,17 +22,10 @@
                 <p class="stock">In stock</p>
                 <p class="shipping">Eligible for FREE Shipping</p>
 
-                <div class="quantity-form">
-                    <form method="post" action="{% url 'update_cart_quantity' item.id %}">
-                        {% csrf_token %}
-                        <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}" class="qty-btn" {% if item.quantity <= 1 %}disabled{% endif %}>−</button>
-                        <input type="number" value="{{ item.quantity }}" readonly class="qty-input">
-                        <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}" class="qty-btn">+</button>
-                    </form>
-                </div>
                 
                 <div class="actions">
                     <a href="{% url 'remove_from_cart' item.id %}">Delete</a>
+                    <a href="{% url 'buy_now' item.product.id %}" class="buy-now-btn">Buy Now</a>
                 </div>
             </div>
 
@@ -44,7 +37,6 @@
 
         <div class="cart-subtotal">
             <h5>Subtotal ({{ cart_items|length }} items): ₹{{ total_price }}</h5>
-            <a href="#" class="checkout-btn">Proceed to Checkout</a>
         </div>
     {% else %}
         <div class="empty-cart">

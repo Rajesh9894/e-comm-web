@@ -1,0 +1,41 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="css-carousel">
+  <!-- Radio buttons for carousel control -->
+  <input type="radio" name="carousel" id="slide-1" checked>
+  <input type="radio" name="carousel" id="slide-2">
+  <input type="radio" name="carousel" id="slide-3">
+
+  <div class="carousel-container">
+    <div class="carousel-track">
+      <div class="carousel-slide">
+        <img src="{% static 'images/dashboard-1.png' %}" alt="Slide 1">
+      </div>
+      <div class="carousel-slide">
+        <img src="{% static 'images/dashboard-2.png' %}" alt="Slide 2">
+      </div>
+      <div class="carousel-slide">
+        <img src="{% static 'images/dashboard-3.png' %}" alt="Slide 3">
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation indicators -->
+  <div class="carousel-indicators">
+    <label for="slide-1" class="indicator"></label>
+    <label for="slide-2" class="indicator"></label>
+    <label for="slide-3" class="indicator"></label>
+  </div>
+
+  <!-- Navigation arrows -->
+  <div class="carousel-controls">
+    <label for="slide-1" class="control prev">‹</label>
+    <label for="slide-2" class="control next">›</label>
+    <label for="slide-3" class="control prev">‹</label>
+    <label for="slide-1" class="control next">›</label>
+    <label for="slide-2" class="control prev">‹</label>
+  </div>
+</div>
+{% endblock %}

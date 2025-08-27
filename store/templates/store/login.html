@@ -1,32 +1,63 @@
-{% extends 'store/base.html' %}
-
-{% block body_class %}auth-page{% endblock %}
-
-{% block content %}
-<div class="auth-container">
-    <div class="auth-logo">
-        <a href="{% url 'home' %}"><i class="fas fa-shopping-bag"></i> MyStore</a>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - MyStore</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-logo">
+            <a href="{% url 'home' %}">
+                <i class="fas fa-shopping-bag"></i> MyStore
+            </a>
+        </div>
+        
+        <h1 class="auth-title">Welcome Back</h1>
+        
+        <!-- Error Messages -->
+        {% if error %}
+        <div class="error-box">
+            {{ error }}
+        </div>
+        {% endif %}
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" 
+                       placeholder="Enter your username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" 
+                       placeholder="Enter your password" required>
+            </div>
+            
+            <button type="submit">Login</button>
+            
+            <div class="auth-footer">
+                Don't have an account? <a href="{% url 'register' %}">Register here</a>
+            </div>
+        </form>
     </div>
-    <h1 class="auth-title">Welcome Back</h1>
-    
-    <form method="POST" class="auth-form">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="Enter your username" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="Enter your password" required>
-        </div>
-        
-        <button type="submit">Login</button>
-        
-        <div class="auth-footer">
-            Don't have an account? <a href="{% url 'register' %}">Register here</a>
-        </div>
-    </form>
-</div>
-{% endblock %}
+</body>
+</html>
+
+

@@ -4,7 +4,12 @@
 {% if messages %}
 <div class="messages">
     {% for message in messages %}
-        <div class="alert alert-success">{{ message }}</div>
+        <div class="alert alert-success alert-dismissible">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
     {% endfor %}
 </div>
 {% endif %}
@@ -12,12 +17,29 @@
 <div class="products-page">
     <div class="container">
         <div class="page-header">
-            <h1><i class="fas fa-store"></i> Our Products</h1>
+            <h1><i class="fas fa-store"></i> 
+                {% if selected_category == 'all' or not selected_category %}
+                    Our Products
+                {% else %}
+                    {{ selected_category|title }}
+                {% endif %}
+            </h1>
             <form method="get" action="{% url 'product_list' %}" class="search-form">
                 <input type="text" name="q" placeholder="Search products..." value="{{ query }}" class="search-input">
+                {% if selected_category %}
+                    <input type="hidden" name="category" value="{{ selected_category }}">
+                {% endif %}
                 <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
             </form>
         </div>
+
+        {% if selected_category %}
+        <div class="category-filter">
+            <span>Filtering by: <strong>{{ selected_category|title }}</strong></span>
+            <a href="{% url 'product_list' %}" class="clear-filter">Clear filter</a>
+        </div>
+        {% endif %}
+        
         {% if products %}
         <div class="products-grid">
             {% for product in products %}
@@ -31,16 +53,61 @@
                     {% if product.is_new %}
                     <div class="product-badge">New</div>
                     {% endif %}
+                    <div class="category-badge">
+                        {% if product.category == "Shirts" %}👕
+                        {% elif product.category == "Shoes" %}👟
+                        {% elif product.category == "Watches" %}⌚
+                        {% elif product.category == "Hoodies" %}🧥
+                        {% elif product.category == "T-Shirts" %}👚
+                        {% elif product.category == "Jeans" %}👖
+                        {% elif product.category == "Sunglasses" %}🕶️
+                        {% elif product.category == "Belts" %}⛓️
+                        {% elif product.category == "Court" %}👟
+                        {% else %}🛍️{% endif %}
+                        {{ product.category }}
+                    </div>
+                    <form method="post" action="{% url 'add_to_wishlist' product.id %}" class="wishlist-form">
+                        {% csrf_token %}
+                        <button type="submit" class="wishlist-btn" title="Add to Wishlist">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </form>
                 </div>
                 <div class="product-info">
                     <h3><a href="{% url 'product_detail' product.id %}">{{ product.name }}</a></h3>
+                    <div class="product-rating">
+                        {% if product.average_rating %}
+                            {% with ''|center:5 as range %}
+                            {% for i in range %}
+                                {% if forloop.counter <= product.average_rating %}
+                                    <i class="fa-solid fa-star"></i>
+                                {% elif forloop.counter|add:"-0.5" == product.average_rating %}
+                                    <i class="fa-solid fa-star-half-stroke"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                            {% endwith %}
+                            <span class="rating-value">({{ product.average_rating|floatformat:1 }})</span>
+                        {% else %}
+                            <span class="no-rating">No rating yet</span>
+                        {% endif %}
+                    </div>
                     <p class="product-description">{{ product.description|truncatechars:100 }}</p>
                     <div class="product-footer">
                         <span class="price">₹{{ product.price }}</span>
-                        <form method="post" action="{% url 'add_to_cart' product.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="add-to-cart-btn">Add to Cart</button>
-                        </form>
+                        <div class="product-actions">
+                            <form method="post" action="{% url 'add_to_cart' product.id %}" class="action-form">
+                                {% csrf_token %}
+                                <button type="submit" class="add-to-cart-btn">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                                <input type="hidden" name="quantity" value="1" min="1" max="10">
+                            </form>
+                            <a href="{% url 'buy_now' product.id %}" class="buy-now-btn">
+                                <i class="fas fa-bolt"></i> Buy Now
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -48,12 +115,22 @@
         </div>
         {% else %}
         <div class="empty-products">
+            {% if selected_category %}
+            <i class="fas fa-folder-open"></i>
+            <h2>No products found in {{ selected_category|title }} category</h2>
+            <p>Try browsing other categories or check back later for new arrivals.</p>
+            {% elif query %}
+            <i class="fas fa-search"></i>
+            <h2>No products found for "{{ query }}"</h2>
+            <p>Try searching with different keywords or browse all products.</p>
+            {% else %}
             <i class="fas fa-box-open"></i>
             <h2>No Products Available</h2>
             <p>We're currently updating our inventory. Please check back soon!</p>
+            {% endif %}
+            <a href="{% url 'product_list' %}" class="btn btn-primary">View All Products</a>
         </div>
         {% endif %}
     </div>
 </div>
 {% endblock %}
-

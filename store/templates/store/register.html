@@ -1,68 +1,69 @@
-{% extends 'store/base.html' %}
-
-{% block body_class %}auth-page{% endblock %}
-
-{% block content %}
-<div class="auth-container">
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - MyStore</title>
+  <link rel="stylesheet" href="{% static 'css/register.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="auth-container">
     <div class="auth-logo">
-        <a href="{% url 'home' %}"><i class="fas fa-shopping-bag"></i> MyStore</a>
+      <a href="{% url 'home' %}"><i class="fa-solid fa-bag-shopping"></i> MyStore</a>
     </div>
     <h1 class="auth-title">Create Account</h1>
 
-    <!-- Show django messages (success from redirect) -->
-    {% if messages %}
-      <div class="messages">
-        {% for msg in messages %}
-          <div class="message {{ msg.tags }}">{{ msg }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    <!-- Show validation errors -->
+    <!-- Error Messages -->
     {% if errors %}
-      <div class="error-box" style="background:#fff0f0;border:1px solid #ffb3b3;padding:12px;margin-bottom:16px;border-radius:6px;color:#900;">
-        <ul style="margin:0;padding-left:18px;">
-          {% for e in errors %}
-            <li>{{ e }}</li>
-          {% endfor %}
-        </ul>
+    <div class="error-box">
+      <ul>
+        {% for error in errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <div class="message {{ message.tags }}">
+        {{ message }}
       </div>
+      {% endfor %}
+    </div>
     {% endif %}
 
     <form method="POST" class="auth-form">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="Choose a username" required
-                   value="{{ username|default:'' }}">
-        </div>
-        
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" placeholder="Enter your email" required
-                   value="{{ email|default:'' }}">
-        </div>
-        
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="Create a password" required>
-            <small style="display:block;margin-top:6px;color:rgba(255,255,255,0.7);font-size:0.9rem;">
-                Password must be at least 8 chars and include a letter, a number, and a special character.
-            </small>
-        </div>
-
-        <div class="form-group">
-            <label for="confirm_password">Confirm Password</label>
-            <input type="password" id="confirm_password" name="confirm_password" placeholder="Repeat password" required>
-        </div>
-        
-        <button type="submit">Register</button>
-        
-        <div class="auth-footer">
-            Already have an account? <a href="{% url 'login' %}">Login here</a>
-        </div>
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Choose a username" 
+               value="{{ username|default:'' }}" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" 
+               value="{{ email|default:'' }}" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Create a password" required>
+      </div>
+      <div class="form-group">
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password" id="confirm_password" name="confirm_password" placeholder="Repeat password" required>
+      </div>
+      <button type="submit">Register</button>
+      <div class="auth-footer">
+        Already have an account? <a href="{% url 'login' %}">Login here</a>
+      </div>
     </form>
-</div>
-{% endblock %}
+  </div>
+</body>
+</html>
+
+
 

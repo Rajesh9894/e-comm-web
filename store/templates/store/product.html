@@ -1,0 +1,401 @@
+ {% extends 'store/base.html' %}
+{% load static %}
+
+{% block content %}
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+        <div class="alert alert-success alert-dismissible">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="product-detail-page">
+    <div class="container">
+        <!-- Breadcrumb Navigation -->
+        <nav aria-label="breadcrumb" class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'product_list' %}">Products</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+            </ol>
+        </nav>
+
+        <!-- Product Details -->
+        <div class="product-detail">
+            <div class="row">
+                <!-- Product Image -->
+                <div class="col-md-6">
+                    <div class="product-image">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid product-main-image">
+                        {% else %}
+                            <img src="{% static 'images/default.png' %}" alt="No image" class="img-fluid product-main-image">
+                        {% endif %}
+                        {% if product.is_new %}
+                        <div class="product-badge">New</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Product Info -->
+                <div class="col-md-6">
+                    <div class="product-info">
+<h1 class="product-title">{{ product.name }}</h1>
+<div class="product-rating">
+    {% if product.average_rating %}
+        {% with ''|center:5 as range %}
+        {% for i in range %}
+            {% if forloop.counter <= product.average_rating %}
+                <i class="fa-solid fa-star"></i>
+            {% elif forloop.counter|add:"-0.5" == product.average_rating %}
+                <i class="fa-solid fa-star-half-stroke"></i>
+            {% else %}
+                <i class="far fa-star"></i>
+            {% endif %}
+        {% endfor %}
+        {% endwith %}
+    {% else %}
+        <span>No rating available</span>
+    {% endif %}
+</div>
+                        
+                        <div class="product-category">
+                            <span class="category-badge">
+                                {% if product.category == "Shirts" %}👕
+                                {% elif product.category == "Shoes" %}👟
+                                {% elif product.category == "Watches" %}⌚
+                                {% elif product.category == "Hoodies" %}🧥
+                                {% elif product.category == "T-Shirts" %}👚
+                                {% elif product.category == "Jeans" %}👖
+                                {% elif product.category == "Sunglasses" %}🕶️
+                                {% elif product.category == "Belts" %}⛓️
+                                {% elif product.category == "Court" %}👟
+                                {% else %}🛍️{% endif %}
+                                {{ product.category }}
+                            </span>
+                        </div>
+
+                        <p class="product-description">{{ product.description }}</p>
+
+                        <div class="product-pricing">
+                            <div class="price-section">
+                                <span class="price">₹{{ product.price }}</span>
+                                {% if product.has_discount %}
+                                <span class="discount">Save ₹{{ product.discount }}</span>
+                                {% endif %}
+                            </div>
+                            {% if product.has_discount %}
+                            <div class="final-price">
+                                Final Price: ₹{{ product.final_price|floatformat:2 }} (incl. GST)
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Size Selection -->
+                        <div class="size-selection">
+                            <label for="size">Select Size:</label>
+                            <select id="size" name="size" required style="max-height: 120px; overflow-y: auto;">
+                                <option value="" disabled selected>Select your size</option>
+                                <option value="XS">XS</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                                <option value="XXL">XXL</option>
+                                <option value="3XL">3XL</option>
+                                <option value="4XL">4XL</option>
+                            </select>
+                        </div>
+
+                        <!-- Product Actions -->
+                        <div class="product-actions">
+                            <form method="post" action="{% url 'add_to_cart' product.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary add-to-cart-btn">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                                <input type="hidden" name="quantity" value="1">
+                            </form>
+                            
+                            <a href="{% url 'buy_now' product.id %}" class="btn btn-success buy-now-btn">
+                                <i class="fas fa-bolt"></i> Buy Now
+                            </a>
+                            
+                            <form method="post" action="{% url 'add_to_wishlist' product.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-secondary wishlist-btn">
+                                    <i class="far fa-heart"></i> Wishlist
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Section -->
+        <div class="feedback-section mt-5">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="section-title">
+                        <i class="fas fa-comments"></i> Customer Feedback
+                        <span class="badge badge-primary">{{ feedback_list|length }} reviews</span>
+                    </h3>
+
+                    <!-- Feedback Form -->
+                    {% if user.is_authenticated %}
+                    <div class="feedback-form card mb-4">
+                        <div class="card-header">
+                            <h5>Share Your Feedback</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if errors %}
+                            <div class="alert alert-danger">
+                                {% for error in errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="rating">Rating:</label>
+                                    <select class="form-control" id="rating" name="rating" required>
+                                        <option value="5" {% if rating == 5 %}selected{% endif %}>★★★★★ (5 stars)</option>
+                                        <option value="4" {% if rating == 4 %}selected{% endif %}>★★★★☆ (4 stars)</option>
+                                        <option value="3" {% if rating == 3 %}selected{% endif %}>★★★☆☆ (3 stars)</option>
+                                        <option value="2" {% if rating == 2 %}selected{% endif %}>★★☆☆☆ (2 stars)</option>
+                                        <option value="1" {% if rating == 1 %}selected{% endif %}>★☆☆☆☆ (1 star)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="comment">Your Feedback:</label>
+                                    <textarea class="form-control" id="comment" name="comment" rows="4" 
+                                              placeholder="Share your experience with this product..." 
+                                              required>{{ comment|default:'' }}</textarea>
+                                    <small class="form-text text-muted">Minimum 10 characters required</small>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <a href="{% url 'login' %}" class="alert-link">Log in</a> to share your feedback about this product.
+                    </div>
+                    {% endif %}
+
+                    <!-- Existing Feedback -->
+                    {% if feedback_list %}
+                    <div class="feedback-list">
+                        {% for feedback in feedback_list %}
+                        <div class="feedback-item card mb-3">
+                            <div class="card-body">
+                                <div class="feedback-header">
+                                    <div class="user-info">
+                                        <strong>{{ feedback.user.username }}</strong>
+                                        <span class="text-muted">• {{ feedback.created_at|timesince }} ago</span>
+                                    </div>
+                                    <div class="rating">
+                                        {% with ''|center:feedback.rating as range %}
+                                        {% for _ in range %}★{% endfor %}
+                                        {% endwith %}
+                                        {% with ''|center:5 as range %}
+                                        {% for _ in range %}{% if forloop.counter > feedback.rating %}☆{% endif %}{% endfor %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                                <p class="feedback-comment mt-2">{{ feedback.comment }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-feedback text-center py-4">
+                        <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                        <h5>No feedback yet</h5>
+                        <p class="text-muted">Be the first to share your experience with this product!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.product-detail-page {
+    padding: 20px 0;
+}
+
+.breadcrumb-nav {
+    margin-bottom: 20px;
+}
+
+.product-image {
+    position: relative;
+    text-align: center;
+}
+
+.product-main-image {
+    width: 150px; /* Set width for square shape */
+    height: 150px; /* Set height for square shape */
+    object-fit: cover; /* Maintain aspect ratio while covering the area */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.product-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff6b6b;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.product-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.product-category {
+    margin-bottom: 15px;
+}
+
+.category-badge {
+    background: #e9ecef;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+}
+
+.product-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.product-pricing {
+    margin-bottom: 25px;
+}
+
+.price-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.price {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.discount {
+    background: #28a745;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.final-price {
+    font-size: 1.2rem;
+    color: #28a745;
+    font-weight: bold;
+}
+
+.product-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.add-to-cart-btn, .buy-now-btn, .wishlist-btn {
+    padding: 12px 20px;
+    font-weight: bold;
+}
+
+.feedback-section {
+    border-top: 2px solid #e9ecef;
+    padding-top: 30px;
+}
+
+.section-title {
+    margin-bottom: 25px;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.feedback-form {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+.feedback-item {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+}
+
+.feedback-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.user-info {
+    font-size: 14px;
+}
+
+.rating {
+    color: #ffc107;
+    font-size: 16px;
+}
+
+.feedback-comment {
+    color: #555;
+    line-height: 1.5;
+}
+
+.empty-feedback {
+    color: #6c757d;
+}
+
+@media (max-width: 768px) {
+    .product-actions {
+        flex-direction: column;
+    }
+    
+    .add-to-cart-btn, .buy-now-btn, .wishlist-btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .feedback-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}
+</style>
+{% endblock %}

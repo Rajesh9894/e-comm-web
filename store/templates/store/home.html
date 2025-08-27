@@ -5,36 +5,63 @@
 {% block content %}
 <div class="hero">
     <div class="hero-content">
-        <h1>Welcome to MyStore</h1>
+        <h1>Welcome to MensWear</h1>
         <p>Discover our amazing products and enjoy your shopping experience.</p>
-        <a href="{% url 'product_list' %}" class="btn-primary">Shop Now</a>
+        <a href="{% url 'product_list' %}" class="shop-now-btn">Shop Now</a>
     </div>
 </div>
 
 <div class="container">
     <div class="featured-section">
-        <h2>Featured Products</h2>
+        <h2 class="section-title">Featured Products</h2>
         <div class="products-grid">
             {% for product in featured_products %}
             <div class="product-card">
-                <div class="product-image">
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                    <div class="product-badge">Featured </div>
+                <div class="product-image-container">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
+                    {% if product.is_featured %}
+                    <span class="featured-badge">Featured</span>
+                    {% endif %}
+                    <form method="post" action="{% url 'add_to_wishlist' product.id %}" class="wishlist-form">
+                        {% csrf_token %}
+                        <button type="submit" class="wishlist-btn" title="Add to Wishlist">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </form>
                 </div>
-                <div class="product-info">
-                    <h3><a href="{% url 'product_detail' product.id %}">{{ product.name }}</a></h3>
-                    <p class="product-description">{{ product.description|truncatechars:80 }}</p>
-                    <div class="product-footer">
-                        <span class="price">₹{{ product.price }}</span>
+                <div class="product-details">
+                    <h3 class="product-title">
+                        <a href="{% url 'product_detail' product.id %}">{{ product.name }}</a>
+                    </h3>
+                    <div class="product-rating">
+                        {% if product.average_rating %}
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= product.average_rating %}
+                                    <i class="fa-solid fa-star"></i>
+                                {% elif forloop.counter|add:"-0.5" <= product.average_rating %}
+                                    <i class="fa-solid fa-star-half-stroke"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <span class="no-rating">No rating</span>
+                        {% endif %}
+                    </div>
+                    <p class="product-desc">{{ product.description|truncatechars:100 }}</p>
+                    <div class="product-actions">
+                        <span class="product-price">₹{{ product.price }}</span>
                         <form method="post" action="{% url 'add_to_cart' product.id %}">
                             {% csrf_token %}
-                            <button type="submit" class="btn-add-to-cart">
+                            <button type="submit" class="add-to-cart-btn">
                                 <i class="fas fa-cart-plus"></i> Add to Cart
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
+            {% empty %}
+            <p>No featured products available.</p>
             {% endfor %}
         </div>
     </div>
