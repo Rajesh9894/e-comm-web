@@ -1,19 +1,19 @@
+# Python #
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
 # Django #
 *.log
 *.pot
-*.pyc
-__pycache__/
 db.sqlite3
 media/
 
-# If you have other SQLite files
-*.sqlite3
+# Ignore all migrations (since you're working alone)
+*/migrations/
 
-# Django migrations (you may remove this if you want migrations in repo)
-*/migrations/__pycache__/
-*/migrations/*.pyc
-
-# Environment #
+# Environments #
 venv/
 env/
 ENV/
@@ -31,5 +31,6 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Static files collected by collectstatic
+# Collected static files #
 staticfiles/
+
