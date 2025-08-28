@@ -6,6 +6,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.db.models import Q, Avg
 from .models import Product, Registerpage, Cart, Wishlist, Order, Feedback
+from .forms import ProductForm
 
 # ---------------- HOME ----------------
 @login_required(login_url='login')
@@ -449,3 +450,44 @@ def order_confirmation_view(request, order_id):
             })
     
     return render(request, 'store/order_confirmation.html', {'order': order})
+
+
+# ---------------- PRODUCT CREATE/UPDATE (Frontend) ----------------
+@login_required(login_url='login')
+def product_create(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            product = form.save()
+            messages.success(request, f"Product '{product.name}' created successfully.")
+            return redirect('product_detail', product_id=product.id)
+    else:
+        form = ProductForm()
+
+    return render(request, 'store/product_form.html', {
+        'form': form,
+        'title': 'Create Product',
+        'submit_label': 'Create'
+    })
+
+
+@login_required(login_url='login')
+def product_update_image(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Updated image for '{product.name}'.")
+            return redirect('product_detail', product_id=product.id)
+    else:
+        # Limit to image field only in the form while keeping validation
+        form = ProductForm(instance=product)
+        # Hide non-image fields in template via context flag
+
+    return render(request, 'store/product_form.html', {
+        'form': form,
+        'title': f"Update Image - {product.name}",
+        'submit_label': 'Update',
+        'image_only': True
+    })
