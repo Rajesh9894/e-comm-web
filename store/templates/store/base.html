@@ -72,6 +72,7 @@
                                 <a href="#"><i class="fas fa-user-circle"></i> {{ request.user.username }}</a>
                                 <ul class="dropdown-menu">
                                     <li><a href="{% url 'account' %}">My Account</a></li>
+                                    <li><a href="{% url 'add_product' %}"><i class="fas fa-plus"></i> Add Product</a></li>
                                     <li><a href="{% url 'view_wishlist' %}">My Wishlist</a></li>
                                     <li><a href="{% url 'view_orders' %}">My Orders</a></li>
                                     <li><a href="{% url 'logout' %}">Logout</a></li>

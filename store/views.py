@@ -449,3 +449,95 @@ def order_confirmation_view(request, order_id):
             })
     
     return render(request, 'store/order_confirmation.html', {'order': order})
+
+
+# ---------------- ADD PRODUCT (Frontend) ----------------
+@login_required(login_url='login')
+def add_product_view(request):
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        description = request.POST.get('description', '').strip()
+        price = request.POST.get('price', '').strip()
+        discount = request.POST.get('discount', '0').strip()
+        category = request.POST.get('category', '').strip()
+        is_new = request.POST.get('is_new') == 'on'
+        image = request.FILES.get('image')
+
+        errors = []
+
+        # Validation
+        if not name:
+            errors.append("Product name is required.")
+        elif len(name) < 3:
+            errors.append("Product name must be at least 3 characters long.")
+
+        if not description:
+            errors.append("Product description is required.")
+        elif len(description) < 10:
+            errors.append("Product description must be at least 10 characters long.")
+
+        if not price:
+            errors.append("Product price is required.")
+        else:
+            try:
+                price_val = float(price)
+                if price_val <= 0:
+                    errors.append("Product price must be greater than 0.")
+            except ValueError:
+                errors.append("Please enter a valid price.")
+
+        if discount:
+            try:
+                discount_val = float(discount)
+                if discount_val < 0:
+                    errors.append("Discount cannot be negative.")
+            except ValueError:
+                errors.append("Please enter a valid discount amount.")
+
+        if not category:
+            errors.append("Product category is required.")
+
+        if not image:
+            errors.append("Product image is required.")
+        elif image.size > 5 * 1024 * 1024:  # 5MB limit
+            errors.append("Image size must be less than 5MB.")
+
+        if errors:
+            return render(request, 'store/add_product.html', {
+                'errors': errors,
+                'name': name,
+                'description': description,
+                'price': price,
+                'discount': discount,
+                'category': category,
+                'is_new': is_new
+            })
+
+        try:
+            # Create new product
+            product = Product.objects.create(
+                name=name,
+                description=description,
+                price=price_val,
+                discount=float(discount) if discount else 0.00,
+                category=category,
+                is_new=is_new,
+                image=image
+            )
+            
+            messages.success(request, f"Product '{product.name}' has been added successfully!")
+            return redirect('product_detail', product_id=product.id)
+            
+        except Exception as e:
+            errors.append("An error occurred while adding the product. Please try again.")
+            return render(request, 'store/add_product.html', {
+                'errors': errors,
+                'name': name,
+                'description': description,
+                'price': price,
+                'discount': discount,
+                'category': category,
+                'is_new': is_new
+            })
+    
+    return render(request, 'store/add_product.html')
