@@ -43,5 +43,9 @@ urlpatterns = [
     
     # Order Confirmation
     path('order/confirmation/<int:order_id>/', views.order_confirmation_view, name='order_confirmation'),
+
+    # Product management (frontend)
+    path('products/create/', views.product_create, name='product_create'),
+    path('products/<int:product_id>/image/', views.product_update_image, name='product_update_image'),
 ]
 
